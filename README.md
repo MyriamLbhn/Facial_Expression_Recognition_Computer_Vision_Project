@@ -6,9 +6,7 @@ L'objectif du projet est concevoir une application qui intègre YOLO-v8, le dern
 Le modèle YOLOv8n a été entrainé sur un dataset pour permettre la reconnaissance des émotions du visage (anger, fear, happy, sad, neutral).    
 Le dataset utilisé pour l'entraînement est disponible sur Roboflow, [ici](https://universe.roboflow.com/emotiondetection/facedetection2-6qc02).
 
-L'application est déployée sur Streamlit Community Cloud, vous pouvez y accéder [ici]().
-
-Elle est également déployée sur docker, vous pouvez y accéder [ici]()
+L'application est déployée sur Azure, vous pouvez y accéder [ici]()
 
 
 ## Arborescence des fichiers
