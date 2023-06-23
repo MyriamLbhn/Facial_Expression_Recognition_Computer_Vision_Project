@@ -3,15 +3,13 @@ from PIL import Image
 import cv2
 import numpy as np
 from ultralytics import YOLO
-import moviepy as mpy
+import moviepy.editor as mpy
 
 # Charger le modèle
 model = YOLO("best_model.pt")
 
 # Titre de l'application Streamlit
 st.title("Reconnaissance faciale d'émotion")
-
-
 
 # Ajouter un menu déroulant dans la sidebar
 option = st.sidebar.selectbox("Sélectionner le type de média", ("Image", "Vidéo", "Webcam"))
@@ -46,50 +44,6 @@ if option == "Image":
             with col2:
                 res_plotted = res[0].plot()
                 st.image(res_plotted, caption='Résultat de détection', use_column_width=True)
-
-elif option == "Vidéo":
-    # Sélectionner une vidéo à partir du fichier local
-    uploaded_file = st.file_uploader("Choisir une vidéo", type=["mp4", "mov"])
-
-    if uploaded_file is not None:
-        # Enregistrer le fichier téléchargé sur le disque
-        with open('uploaded_video.mp4', 'wb') as f:
-            f.write(uploaded_file.getbuffer())
-
-        # Charger la vidéo
-        video = mpy.VideoFileClip('uploaded_video.mp4')
-        
-        # reduire les fps de la vidéo
-        video = video.set_fps(30)
-        # rediot ma taille de la vidéo  à 480p
-        video = video.resize(height=480)
-
-        # Créer une fonction pour traiter chaque image de la vidéo
-        def process_image(image):
-            # Convertir l'image en tableau numpy
-            image_np = np.array(image)
-
-            # Prédire sur l'image
-            res = model.predict(image_np)
-
-            # Dessiner les détections sur l'image
-            res_plotted = res[0].plot()
-
-            # Convertir l'image de retour en format PIL
-            image_pil = Image.fromarray(res_plotted)
-
-            return np.array(image_pil)
-
-        # Indiquer que le traitement est en cours
-        with st.spinner('Processing the video...'):
-            # Appliquer la fonction de traitement à chaque image de la vidéo
-            processed_video = video.fl_image(process_image)
-
-            # Enregistrer la vidéo traitée
-            processed_video.write_videofile("processed_video.mp4", codec='libx264')
-
-        # Afficher la vidéo traitée
-        st.video("processed_video.mp4")
 
 elif option == "Webcam":
      # Capture vidéo à partir de la webcam
@@ -129,3 +83,75 @@ elif option == "Webcam":
     # Libérer les ressources
     video_capture.release()
     cv2.destroyAllWindows()
+    
+
+elif option == "Vidéo":
+    # Sélectionner une vidéo à partir du fichier local
+    uploaded_file = st.file_uploader("Choisir une vidéo", type=["mp4", "mov"])
+
+    if uploaded_file is not None:
+        # Enregistrer le fichier téléchargé sur le disque
+        with open('uploaded_video.mp4', 'wb') as f:
+            f.write(uploaded_file.getbuffer())
+
+        # Charger la vidéo
+        video = mpy.VideoFileClip('uploaded_video.mp4')
+
+        # Reduire les fps de la vidéo
+        video = video.set_fps(30)
+
+        # Reduire la taille de la vidéo à 480p
+        video = video.resize(height=480)
+
+        # Obtenir le nombre total de frames dans la vidéo
+        total_frames = int(video.fps * video.duration)
+
+        # Créer une barre de progression
+        progress_bar = st.progress(0)
+
+        # Fonction pour traiter chaque image de la vidéo
+        def process_image(image):
+            # Convertir l'image en tableau numpy
+            image_np = np.array(image)
+
+            # Prédire sur l'image
+            res = model.predict(image_np)
+
+            # Dessiner les détections sur l'image
+            res_plotted = res[0].plot()
+
+            # Convertir l'image de retour en format PIL
+            image_pil = Image.fromarray(res_plotted)
+
+            return np.array(image_pil)
+
+        # Indiquer que le traitement est en cours
+        with st.spinner('Traitement de la vidéo en cours...'):
+            # Créer une liste pour stocker les images traitées
+            processed_frames = []
+
+            # Boucle de traitement de chaque image de la vidéo
+            for i, frame in enumerate(video.iter_frames()):
+                # Convertir l'image en format PIL
+                image_pil = Image.fromarray(frame)
+
+                # Appliquer la fonction de traitement à chaque image
+                processed_frame = process_image(image_pil)
+
+                # Ajouter l'image traitée à la liste
+                processed_frames.append(processed_frame)
+
+                # Mettre à jour la barre de progression
+                progress_bar.progress((i + 1) / total_frames)
+
+        # Convertir la liste d'images traitées en un tableau numpy
+        processed_frames_np = np.array(processed_frames)
+
+        # Créer une vidéo à partir des images traitées
+        output_video = mpy.ImageSequenceClip(list(processed_frames_np), fps=video.fps)
+
+        # Enregistrer la vidéo traitée
+        output_video.write_videofile("processed_video.mp4", codec='libx264')
+
+        # Afficher la vidéo traitée
+        st.video("processed_video.mp4")
