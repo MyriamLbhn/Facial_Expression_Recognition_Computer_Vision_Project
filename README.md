@@ -4,7 +4,11 @@
 
 L'objectif du projet est concevoir une application qui intègre YOLO-v8, le dernier modèle d'IA pour la vision par ordinateur en 2023.
 Le modèle YOLOv8n a été entrainé sur un dataset pour permettre la reconnaissance des émotions du visage (anger, fear, happy, sad, neutral).    
-Le dataset utilisé pour l'entraînement est disponible sur Roboflow, [ici](https://universe.roboflow.com/emotiondetection/facedetection2-6qc02)
+Le dataset utilisé pour l'entraînement est disponible sur Roboflow, [ici](https://universe.roboflow.com/emotiondetection/facedetection2-6qc02).
+
+L'application est déployée sur Streamlit Community Cloud, vous pouvez y accéder [ici]().
+
+Elle est également déployée sur docker, vous pouvez y accéder [ici]()
 
 
 ## Arborescence des fichiers
@@ -34,5 +38,5 @@ Installez les bibliothèques requises à l'aide de `pip install -r requirements.
 
 ## Lancer l'application Streamlit
 
-Exécutez la commande suivante pour lancer l'application : `streamlit run app.py`  
+Depuis le répertoire de l'application, exécutez la commande suivante pour lancer l'application : `streamlit run app.py`  
 Streamlit ouvrira automatiquement un navigateur et affichera l'application. 
