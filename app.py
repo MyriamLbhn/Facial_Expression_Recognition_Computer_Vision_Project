@@ -5,7 +5,7 @@ import streamlit as st
 from PIL import Image
 import cv2
 import moviepy.editor as mpy
-from utils import process_image, process_webcam , process_video
+from utils import process_image, process_webcam
 
 
 # Titre de l'application Streamlit

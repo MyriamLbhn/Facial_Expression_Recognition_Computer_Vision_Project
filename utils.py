@@ -27,21 +27,6 @@ def process_image(image):
 
     return np.array(image_pil)
 
-def process_video(video):
-    """
-    Fonction pour traiter une vidéo et effectuer une prédiction sur chaque image.
-    Prend en entrée une vidéo et renvoie la vidéo avec les détections dessinées.
-    """
-    # Reduire les fps de la vidéo
-    video = video.set_fps(30)
-
-    # Reduire la taille de la vidéo à 480p
-    video = video.resize(height=480)
-
-    # Appliquer la fonction de traitement à chaque image de la vidéo
-    processed_video = video.fl_image(process_image)
-
-    return processed_video
 
 def process_webcam(video_capture):
     """
