@@ -1,0 +1,6 @@
+streamlit
+ultralytics
+Pillow
+opencv-python
+moviepy
+
