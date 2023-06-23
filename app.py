@@ -1,12 +1,11 @@
+# app.py
+
+import numpy as np
 import streamlit as st
 from PIL import Image
 import cv2
-import numpy as np
-from ultralytics import YOLO
 import moviepy.editor as mpy
-
-# Charger le modèle
-model = YOLO("best_model.pt")
+from utils import process_image, process_webcam , process_video
 
 # Titre de l'application Streamlit
 st.title("Reconnaissance faciale d'émotion")
@@ -15,7 +14,6 @@ st.title("Reconnaissance faciale d'émotion")
 option = st.sidebar.selectbox("Sélectionner le type de média", ("Image", "Vidéo", "Webcam"))
 
 if option == "Image":
-
     # Sélectionner une image à partir du fichier local
     uploaded_file = st.file_uploader("Choisir une image", type=["jpg", "jpeg", "png"])
 
@@ -34,44 +32,24 @@ if option == "Image":
 
         # Bouton de prédiction
         if st.button("Prédire"):
-            # Convertir l'image en tableau numpy
-            image_np = np.array(image)
-
-            # Prédire sur l'image chargée
-            res = model.predict(image_np)
+            # Appliquer la fonction de traitement à l'image
+            processed_image = process_image(image)
 
             # Afficher le résultat de détection à droite
             with col2:
-                res_plotted = res[0].plot()
-                st.image(res_plotted, caption='Résultat de détection', use_column_width=True)
+                st.image(processed_image, caption='Résultat de détection', use_column_width=True)
 
 elif option == "Webcam":
-     # Capture vidéo à partir de la webcam
+    # Capture vidéo à partir de la webcam
     video_capture = cv2.VideoCapture(0)
 
     # Créer un espace pour afficher l'image annotée
     image_placeholder = st.empty()
 
     # Boucle principale de l'application Streamlit
-    while True:
-        # Lire la vidéo frame par frame
-        ret, frame = video_capture.read()
-
-        # Redimensionner la frame si nécessaire
-        if frame.shape[1] > 800:
-            frame = cv2.resize(frame, (800, int(frame.shape[0] * 800 / frame.shape[1])))
-
-        # Convertir l'image en format approprié
-        img = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-
-        # Utiliser le modèle YOLO pour prédire les détections
-        res = model.predict(img)
-
-        # Dessiner les détections sur l'image
-        res_plotted = res[0].plot()
-
+    for processed_frame in process_webcam(video_capture):
         # Convertir l'image annotée en format BGR pour l'affichage avec OpenCV
-        annotated_frame = cv2.cvtColor(res_plotted, cv2.COLOR_RGB2BGR)
+        annotated_frame = cv2.cvtColor(processed_frame, cv2.COLOR_RGB2BGR)
 
         # Afficher l'image annotée dans Streamlit
         image_placeholder.image(annotated_frame, channels="BGR", caption='Résultat de détection', use_column_width=True)
@@ -83,7 +61,6 @@ elif option == "Webcam":
     # Libérer les ressources
     video_capture.release()
     cv2.destroyAllWindows()
-    
 
 elif option == "Vidéo":
     # Sélectionner une vidéo à partir du fichier local
@@ -109,22 +86,6 @@ elif option == "Vidéo":
         # Créer une barre de progression
         progress_bar = st.progress(0)
 
-        # Fonction pour traiter chaque image de la vidéo
-        def process_image(image):
-            # Convertir l'image en tableau numpy
-            image_np = np.array(image)
-
-            # Prédire sur l'image
-            res = model.predict(image_np)
-
-            # Dessiner les détections sur l'image
-            res_plotted = res[0].plot()
-
-            # Convertir l'image de retour en format PIL
-            image_pil = Image.fromarray(res_plotted)
-
-            return np.array(image_pil)
-
         # Indiquer que le traitement est en cours
         with st.spinner('Traitement de la vidéo en cours...'):
             # Créer une liste pour stocker les images traitées
@@ -142,7 +103,7 @@ elif option == "Vidéo":
                 processed_frames.append(processed_frame)
 
                 # Mettre à jour la barre de progression
-                progress_bar.progress((i + 1) / total_frames)
+                progress_bar.progress(min((i + 1) / total_frames, 1.0))
 
         # Convertir la liste d'images traitées en un tableau numpy
         processed_frames_np = np.array(processed_frames)
@@ -150,8 +111,12 @@ elif option == "Vidéo":
         # Créer une vidéo à partir des images traitées
         output_video = mpy.ImageSequenceClip(list(processed_frames_np), fps=video.fps)
 
+        # Ajouter le son
+        output_video = output_video.set_audio(video.audio)
+
         # Enregistrer la vidéo traitée
         output_video.write_videofile("processed_video.mp4", codec='libx264')
 
         # Afficher la vidéo traitée
         st.video("processed_video.mp4")
+
