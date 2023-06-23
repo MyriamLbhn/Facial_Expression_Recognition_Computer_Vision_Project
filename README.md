@@ -17,7 +17,7 @@ Ce projet est organisé en plusieurs fichiers :
 
 *best_model.pt* : modèle yolov8n entrainé sur le dataset de reconnaissance d'émotion.  
 
-*utils.py* : fonctions nescessaire au fonctionnemment de l'application Streamlit.
+*utils.py* : fonctions nescessaires au fonctionnemment de l'application Streamlit.
 
 *app.py* : script de l'application
 
