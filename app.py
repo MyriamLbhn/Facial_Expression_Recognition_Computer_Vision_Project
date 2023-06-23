@@ -6,6 +6,12 @@ from PIL import Image
 import cv2
 import moviepy.editor as mpy
 from utils import process_image, process_webcam , process_video
+#Pour le deploiement sur Streamlit Cloud
+import subprocess
+subprocess.call(['apt-get', 'update', '-y'])
+subprocess.call(['apt-get', 'install', '-y', 'libgl1-mesa-glx'])
+
+
 
 # Titre de l'application Streamlit
 st.title("Reconnaissance faciale d'émotion")
