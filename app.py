@@ -7,6 +7,7 @@ import cv2
 import moviepy.editor as mpy
 from utils import process_image, process_webcam , process_video
 
+
 # Titre de l'application Streamlit
 st.title("Reconnaissance faciale d'émotion")
 

@@ -3,4 +3,3 @@ ultralytics
 Pillow
 opencv-python
 moviepy
-
