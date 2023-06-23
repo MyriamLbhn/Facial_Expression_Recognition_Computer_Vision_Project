@@ -1,5 +1,10 @@
 # Facial_Expression_Recognition_Computer_Vision_Project
 
+
+## Contexte
+
+Le contexte fictif de ce projet est une clinique de santé mentale qui cherche à améliorer la qualité des soins qu'elle offre à ses patients. La clinique a constaté que le diagnostic et le suivi des troubles de l'humeur peuvent être un processus complexe et subjectif. Pour améliorer cela, la clinique a décidé d'explorer l'utilisation de la technologie de reconnaissance faciale d'émotion.
+
 ## Objectifs
 
 L'objectif du projet est concevoir une application qui intègre YOLO-v8, le dernier modèle d'IA pour la vision par ordinateur en 2023.
